@@ -1,5 +1,6 @@
 package com.gratum.firebasecorutinas1
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +8,8 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenCreated
+import com.gratum.firebasecorutinas1.databinding.ActivityInputInfoBinding
+import com.gratum.firebasecorutinas1.databinding.ActivityMainBinding
 import com.gratum.firebasecorutinas1.model.MemberModel
 import com.gratum.firebasecorutinas1.viewmodel.MemberViewModel
 import com.gratum.firebasecorutinas1.viewmodel.MemberViewModelState
@@ -18,16 +21,26 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     private val viewModel: MemberViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         initFlow()
         //registerTest()
        // signInTest()
         //deleteTest("9fa3a375f79145249c43b6e484d6cb02")
+
+        binding.button2.setOnClickListener {
+            val pantalla1 = Intent(this, InputInfoActivity::class.java)
+            startActivity(pantalla1)
+        }
     }
 
     private fun deleteTest(uuId: String) {
