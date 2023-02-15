@@ -59,4 +59,32 @@ object CloudFileStoreWrapper {
         }
     }
 
+    suspend fun update(colletionPath: String, documentPath: String, map: MutableMap<String, Any>): Void{
+
+        return suspendCoroutine { continuation ->
+
+            Firebase.firestore.collection(colletionPath).document(documentPath).update(map)
+                .addOnSuccessListener {
+                    continuation.resume(it)
+                }
+                .addOnFailureListener{
+                    continuation.resumeWithException(it)
+                }
+        }
+    }
+
+    suspend fun delete(colletionPath: String,documentPath: String):Void{
+
+        return suspendCoroutine {continuation ->
+
+            Firebase.firestore.collection(colletionPath).document(documentPath).delete()
+                .addOnSuccessListener {
+                    continuation.resume(it)
+                }
+                .addOnFailureListener{
+                    continuation.resumeWithException(it)
+                }
+        }
+    }
+
 }

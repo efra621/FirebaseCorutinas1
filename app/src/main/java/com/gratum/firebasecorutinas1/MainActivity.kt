@@ -26,7 +26,21 @@ class MainActivity : AppCompatActivity() {
 
         initFlow()
         //registerTest()
-        signInTest()
+       // signInTest()
+        //deleteTest("9fa3a375f79145249c43b6e484d6cb02")
+    }
+
+    private fun deleteTest(uuId: String) {
+        viewModel.delete(uuId)
+    }
+
+    private fun modifyTest(memberModel: MemberModel){
+
+        memberModel.email = "test_new@test.com"
+        memberModel.nickname = "tester new"
+        memberModel.modifyDate = getCurrentDateTimeString()
+
+        viewModel.modify(memberModel)
     }
 
     private fun signInTest() {
@@ -37,12 +51,12 @@ class MainActivity : AppCompatActivity() {
         val memberMode = MemberModel()
 
         //as user seq
-        val uuid = getCurrentDateTimeString()
+        val uuid = getRandomUUIDString()
 
         memberMode.uuId = uuid
-        memberMode.id = "test"
+        memberMode.id = "efratest"
         memberMode.password = "123456"
-        memberMode.email = "test@test.com"
+        memberMode.email = "efra@test.com"
         memberMode.nickname = "tester"
         memberMode.profileImageUrl = ""
         memberMode.profileImageFileCloudPath = ""
@@ -52,6 +66,10 @@ class MainActivity : AppCompatActivity() {
         memberMode.modifyBy = uuid
 
         viewModel.register(memberMode)
+    }
+
+    private fun getRandomUUIDString(): String {
+        return UUID.randomUUID().toString().replace("-", "")
     }
 
     private fun getCurrentDateTimeString(): String {
@@ -76,7 +94,24 @@ class MainActivity : AppCompatActivity() {
                             Log.d("???", "${it.memberModel.toDictionary()}")
                             Toast.makeText(this@MainActivity, "sign in success", Toast.LENGTH_SHORT)
                                 .show()
+
+                            //sign in success
+                            modifyTest(it.memberModel)
                         }
+                        is MemberViewModelState.UpdateSuccessfully ->{
+                            //modify success
+                            Log.d("???", "${it.memberModel.toDictionary()}")
+                            Toast.makeText(this@MainActivity, "modify in success", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+
+                        is MemberViewModelState.DeleteSuccessfully ->{
+                            //delete success
+                            Log.d("???", "${it.uuId}")
+                            Toast.makeText(this@MainActivity, "delete in success", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+
                         is MemberViewModelState.Loading -> {
                             //show progresss here
                         }

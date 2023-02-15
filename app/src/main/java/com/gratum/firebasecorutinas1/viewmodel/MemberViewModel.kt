@@ -17,6 +17,10 @@ sealed class MemberViewModelState{
     data class SingSuccessfully(val memberModel: MemberModel): MemberViewModelState()
     data class Error(val message: String): MemberViewModelState()
 
+    data class UpdateSuccessfully(val memberModel: MemberModel): MemberViewModelState()
+    data class DeleteSuccessfully(val uuId: String): MemberViewModelState()
+
+
     object Empty: MemberViewModelState()
     object Loading: MemberViewModelState()
     object None: MemberViewModelState()
@@ -69,4 +73,38 @@ class MemberViewModel :ViewModel(){
             _memberViewModelState.value = MemberViewModelState.Error(e.message.toString())
         }
     }
+
+    fun modify(memberModel: MemberModel) = viewModelScope.launch {
+
+        _memberViewModelState.value = MemberViewModelState.Loading
+
+        try {
+            coroutineScope {
+                val modify = async {
+                    MemberModelService.modify(memberModel)
+                }
+                modify.await()
+                _memberViewModelState.value = MemberViewModelState.UpdateSuccessfully(memberModel)
+            }
+        }catch (e:Exception){
+            _memberViewModelState.value = MemberViewModelState.Error(e.message.toString())
+        }
+    }
+
+    fun delete(uuId: String) = viewModelScope.launch {
+
+        _memberViewModelState.value = MemberViewModelState.Loading
+
+        try {
+            coroutineScope {
+                val delete = async {
+                    MemberModelService.delete(uuId)
+                }
+            }
+        }catch (e: Exception){
+            _memberViewModelState.value = MemberViewModelState.Error(e.message.toString())
+        }
+
+    }
+
 }

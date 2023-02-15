@@ -5,6 +5,7 @@ import com.gratum.firebasecorutinas1.firebase.cloudfirestore.CloudFileStoreWrapp
 import com.gratum.firebasecorutinas1.model.MemberModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.UUID
 
 object MemberModelService {
 
@@ -30,5 +31,18 @@ object MemberModelService {
             MemberModel.CLOUD_FIRE_STORE_PATH,
             map
             )
+    }
+
+    suspend fun modify(memberModel: MemberModel):Void = withContext(Dispatchers.IO){
+
+        return@withContext CloudFileStoreWrapper.update(
+            MemberModel.CLOUD_FIRE_STORE_PATH,
+            memberModel.uuId,
+            memberModel.toDictionary()
+        )
+    }
+
+    suspend fun delete(uuId: String): Void = withContext(Dispatchers.IO){
+        return@withContext CloudFileStoreWrapper.delete(MemberModel.CLOUD_FIRE_STORE_PATH, uuId)
     }
 }
