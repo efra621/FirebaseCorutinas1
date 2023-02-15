@@ -1,7 +1,9 @@
 package com.gratum.firebasecorutinas1.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gratum.firebasecorutinas1.firebase.storage.FirebaseStorageManager
 import com.gratum.firebasecorutinas1.model.MemberModel
 import com.gratum.firebasecorutinas1.modelservice.MemberModelService
 import kotlinx.coroutines.async
@@ -32,16 +34,35 @@ class MemberViewModel :ViewModel(){
     private val _memberViewModelState = MutableStateFlow<MemberViewModelState>(MemberViewModelState.None)
     val memberViewModelState : StateFlow<MemberViewModelState> = _memberViewModelState
 
-    fun register(memberModel: MemberModel) = viewModelScope.launch {
+    //Añadimos la imgaen url para registrar la coleccion y el imageFileName para saber donde guardarlo
+    fun register(imageUri: Uri,imageFileName: String, memberModel: MemberModel) = viewModelScope.launch {
 
         _memberViewModelState.value = MemberViewModelState.Loading
 
         try {
-            val register = async {
-                MemberModelService.register(memberModel)
+            coroutineScope {
+
+                val uploadImage = async {
+                    MemberModelService.uploadImageFile(imageUri ,imageFileName)
+                }
+                val imageUrl = uploadImage.await()
+
+                //image in your storage, the path is Member/xxxxxxxxxx.jpg
+                //keep the path, because when you want delete the image from storage, need the path
+                val imagePath = "${FirebaseStorageManager.MEMBER_IMAGE_FOLDER}$imageFileName"
+
+                //update image url and image path of the member model
+                memberModel.profileImageUrl = imageUrl
+                memberModel.profileImageFileCloudPath = imagePath
+
+                //then register
+                val register = async {
+                    MemberModelService.register(memberModel)
+                }
+                register.await()
+                _memberViewModelState.value = MemberViewModelState.RegisterSuccessfully(memberModel)
             }
-            register.await()
-            _memberViewModelState.value = MemberViewModelState.RegisterSuccessfully(memberModel)
+
         }catch (e: java.lang.Exception){
             _memberViewModelState.value = MemberViewModelState.Error(e.message.toString())
         }

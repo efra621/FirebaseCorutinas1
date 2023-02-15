@@ -1,7 +1,10 @@
 package com.gratum.firebasecorutinas1.modelservice
 
+import android.net.Uri
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.ktx.Firebase
 import com.gratum.firebasecorutinas1.firebase.cloudfirestore.CloudFileStoreWrapper
+import com.gratum.firebasecorutinas1.firebase.storage.FirebaseStorageManager
 import com.gratum.firebasecorutinas1.model.MemberModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -44,5 +47,13 @@ object MemberModelService {
 
     suspend fun delete(uuId: String): Void = withContext(Dispatchers.IO){
         return@withContext CloudFileStoreWrapper.delete(MemberModel.CLOUD_FIRE_STORE_PATH, uuId)
+    }
+
+    suspend fun uploadImageFile(uri: Uri, fileName:String): String = withContext(Dispatchers.IO){
+        return@withContext FirebaseStorageManager.uploadImage(
+            uri = uri,
+            folderName = FirebaseStorageManager.MEMBER_IMAGE_FOLDER,
+            fileName = fileName
+        )
     }
 }
