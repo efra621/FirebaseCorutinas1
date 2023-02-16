@@ -59,6 +59,13 @@ class MainActivity : AppCompatActivity() {
             val pantalla1 = Intent(this, InputInfoActivity::class.java)
             startActivity(pantalla1)
         }
+
+
+        binding.btIntentToPagination.setOnClickListener {
+            val pantalla1 = Intent(this, PaginationTestActivity::class.java)
+            startActivity(pantalla1)
+        }
+
     }
 
     private fun deleteTest(uuId: String) {
